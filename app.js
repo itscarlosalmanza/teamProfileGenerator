@@ -10,26 +10,239 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
+const teamMembers = [];
 
-// Write code to use inquirer to gather information about the development team members,
-// and to create objects for each team member (using the correct classes as blueprints!)
+const idArray = [];
 
-// After the user has input all employees desired, call the `render` function (required
-// above) and pass in an array containing all employee objects; the `render` function will
-// generate and return a block of HTML including templated divs for each employee!
+function app() {
+  function createManager() {
+    console.log("Build Your Team");
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "managerName",
+          message: "Your Managers Name?",
+          validate: (answer) => {
+            if (answer !== "") {
+              return true;
+            }
+            return "Must Type At Least One Character";
+          },
+        },
+        {
+          type: "input",
+          name: "managerId",
+          message: "Your Managers Id?",
+          validate: (answer) => {
+            const pass = answer.match(/^[1-9]\d*$/);
+            if (pass) {
+              return true;
+            }
+            return "Enter A Number Greater than 0";
+          },
+        },
+        {
+          type: "input",
+          name: "managerEmail",
+          message: "Your Managers Email?",
+          validate: (answer) => {
+            const pass = answer.match(/\S+@\S+\.\S+/);
+            if (pass) {return true;}
+            return "Enter Valid Email Address"; 
+            
+          },
+        },
+        {
+          type: "input",
+          name: "managerOfficeNumber",
+          message: "Your Managers Office Number?",
+          validate: (answer) => {
+            const pass = answer.match(/^[1-9]\d*$/);
+            if (pass) {
+              return true;
+            }
+            return "Enter A Number Greater than 0";
+          },
+        },
+      ])
+      .then((answers) => {
+        const manager = new Manager(
+          answers.managerName,
+          answers.managerId,
+          answers.managerEmail,
+          answers.managerOfficeNumber
+        );
+        teamMembers.push(manager);
+        idArray.push(answers.managerId);
+        createTeam();
+      });
+  }
 
-// After you have your html, you're now ready to create an HTML file using the HTML
-// returned from the `render` function. Now write it to a file named `team.html` in the
-// `output` folder. You can use the variable `outputPath` above target this location.
-// Hint: you may need to check if the `output` folder exists and create it if it
-// does not.
+  function createTeam() {
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "memberChoice",
+          message: "Wate Type Of TeamMember Are You Adding?",
+          choices: ["Engineer", "Intern", "No More Team Members To Add"],
+        },
+      ])
+      .then((userChoice) => {
+        switch (userChoice.memberChoice) {
+          case "Egineer":
+            addEngineer();
+            break;
+          case "Intern":
+            addIntern();
+            break;
+          default:
+            buildTeam();
+        }
+      });
+  }
 
-// HINT: each employee type (manager, engineer, or intern) has slightly different
-// information; write your code to ask different questions via inquirer depending on
-// employee type.
+  function addEngineer() {
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "engineerName",
+          message: "Your Engineers Name?",
+          validate: (answer) => {
+            if (answer !== "") {
+              return true;
+            }
+          },
+        },
+        {
+          type: "input",
+          name: "engineerId",
+          message: "Your Engineers Id?",
+          validate: (answer) => {
+            const pass = answer.match(/^[1-9]\d*$/);
+            if (pass) {
+              if (idArray.includes(answer)) {
+                return "ID is TAKEN, Choose Another Number";
+              } else {
+                return true;
+              }
+            }
+            return "Enter A Number Greater than 0";
+          },
+        },
+        {
+          type: "input",
+          name: "engineerEmail",
+          message: "Your Engineers Email?",
+          validate: (answer) => {
+            const pass = answer.match(/\S+@\S+\.\S+/);
+            if (pass) {
+              return true;
+            }
+            return "Enter Valid Email Address";
+          },
+        },
+        {
+          type: "input",
+          name: "engineerGitHub",
+          message: "Your Engineer's GitHub Username?",
+          validate: (answer) => {
+            if (answer !== "") {
+              return true;
+            }
+            return "Must Type At Least One Character";
+          },
+        },
+      ])
+      .then((answers) => {
+        const engineer = new Engineer(
+          answers.egineerName,
+          answers.egineerId,
+          answers.engineerEmail,
+          answers.egineerGitHub
+        );
+        teamMembers.push(engineer);
+        idArray.push(answers.egineerId);
+        createTeam();
+      });
+  }
 
-// HINT: make sure to build out your classes first! Remember that your Manager, Engineer,
-// and Intern classes should all extend from a class named Employee; see the directions
-// for further information. Be sure to test out each class and verify it generates an
-// object with the correct structure and methods. This structure will be crucial in order
-// for the provided `render` function to work! ```
+  function addIntern() {
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "internName",
+          message: "Your Interns Name?",
+          validate: (answer) => {
+            if (answer !== "") {
+              return true;
+            }
+            return "Must Type At Least One Character";
+          },
+        },
+        {
+          type: "input",
+          name: "internId",
+          message: "Your Interns Id?",
+          validate: (answer) => {
+            const pass = answer.match(/^[1-9]\d*$/);
+            if (pass) {
+              if (idArray.includes(answer)) {
+                return "ID is TAKEN, Choose Another Number";
+              } else {
+                return true;
+              }
+            }
+            return "Enter A Number Greater than 0";
+          },
+        },
+        {
+          type: "input",
+          name: "internEmail",
+          message: "Your Intern's Email?",
+          validate: (answer) => {
+            const pass = answer.match(/\S+@\S+\.\S+/);
+            if (pass) {
+              return true;
+            }
+            return "Enter Valid Email Address";
+          },
+        },
+        {
+          type: "input",
+          name: "internSchool",
+          message: "Your Intern's School?",
+          validate: (answer) => {
+            if (answer !== "") {
+              return true;
+            }
+            return "Must Type At Least One Character";
+          },
+        },
+      ])
+      .then((answers) => {
+        const intern = new Intern(
+          answers.internName,
+          answers.internId,
+          answers.internEmail,
+          answers.internSchool
+        );
+        teamMembers.push(intern);
+        idArray.push(answers.internId);
+        createTeam();
+      });
+  }
+
+  function buildTeam() {
+    if (!fs.existsSync(OUTPUT_DIR)) {
+      fs.mkdirSync(OUTPUT_DIR);
+    }
+    fs.writeFileSync(outputPath, render(teamMembers), "utf-8");
+  }
+
+  createManager();
+}
+app();
